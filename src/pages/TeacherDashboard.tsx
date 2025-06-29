@@ -16,30 +16,8 @@ import { Progress } from "@/components/ui/progress";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { BookOpen, Users, BarChart2, Clock, Home, User, FileText, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
-
-const summary = [
-  {
-    label: "Total Students",
-    value: 128,
-    icon: Users,
-    sub: "Active this semester",
-    color: "bg-classdojo-blue text-white",
-  },
-  {
-    label: "Average Progress",
-    value: "85%",
-    icon: BarChart2,
-    sub: "Class performance",
-    color: "bg-classdojo-orange text-white",
-  },
-  {
-    label: "Hours This Week",
-    value: 32,
-    icon: Clock,
-    sub: "Teaching hours",
-    color: "bg-classdojo-purple text-white",
-  },
-];
+import { useEffect, useState } from "react";
+import { supabase } from "@/lib/supabaseClient";
 
 const classProgress = [
   { subject: "Mathematics", percent: 92 },
@@ -58,9 +36,56 @@ const recentActivity = [
 export default function TeacherDashboard() {
   const { user } = useUser();
   const { signOut } = useClerk();
+  const [students, setStudents] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchStudents = async () => {
+      if (!user) return;
+      // Get teacher by Clerk ID
+      const { data: teacher } = await supabase
+        .from('teachers')
+        .select('id')
+        .eq('clerk_id', user.id)
+        .single();
+      if (!teacher) return setLoading(false);
+      // Get class for teacher
+      const { data: classData } = await supabase
+        .from('classes')
+        .select('id')
+        .eq('teacher_id', teacher.id)
+        .single();
+      if (!classData) return setLoading(false);
+      // Get students in class
+      const { data: studentsData } = await supabase
+        .from('students')
+        .select('*')
+        .eq('class_id', classData.id);
+      setStudents(studentsData || []);
+      setLoading(false);
+    };
+    fetchStudents();
+  }, [user]);
 
   if (!user) return null;
   if (user.unsafeMetadata.role !== "teacher") return <Navigate to="/" />;
+
+  const summary = [
+    {
+      label: "Total Students",
+      value: students.length,
+      icon: Users,
+      sub: "Active this semester",
+      color: "bg-classdojo-blue text-white",
+    },
+    {
+      label: "Average Progress",
+      value: "85%",
+      icon: BarChart2,
+      sub: "Class performance",
+      color: "bg-classdojo-orange text-white",
+    },
+  ];
 
   return (
     <div className="min-h-screen flex bg-gray-50">
@@ -86,22 +111,15 @@ export default function TeacherDashboard() {
                 </SidebarMenuItem>
                 <SidebarMenuItem>
                   <SidebarMenuButton asChild>
-                    <a href="#">
+                    <a href="/dashboard/teacher/class">
                       <BookOpen className="mr-2" /> Classes
                     </a>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
                 <SidebarMenuItem>
                   <SidebarMenuButton asChild>
-                    <a href="#">
+                    <a href="/dashboard/teacher/students">
                       <User className="mr-2" /> Students
-                    </a>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-                <SidebarMenuItem>
-                  <SidebarMenuButton asChild>
-                    <a href="#">
-                      <FileText className="mr-2" /> Reports
                     </a>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -160,6 +178,24 @@ export default function TeacherDashboard() {
                       </div>
                     ))}
                   </div>
+                </CardContent>
+              </Card>
+            </div>
+            <div className="max-w-3xl">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Class Students</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {loading ? (
+                    <div>Loading students...</div>
+                  ) : (
+                    <ul>
+                      {students.map((student) => (
+                        <li key={student.id}>{student.name}</li>
+                      ))}
+                    </ul>
+                  )}
                 </CardContent>
               </Card>
             </div>

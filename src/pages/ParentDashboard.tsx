@@ -6,6 +6,8 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Star, Trophy, Clock, Users, MessageCircle, Calendar, Camera, FileText, Users as UsersIcon, Bell } from "lucide-react";
 import Header from "@/components/Header";
+import { useEffect, useState } from "react";
+import { supabase } from "@/lib/supabaseClient";
 
 const summary = [
   { label: "Average Grade", value: "4.8", icon: Star, color: "bg-yellow-100 text-yellow-700" },
@@ -41,6 +43,37 @@ const features = [
 
 export default function ParentDashboard() {
   const { user } = useUser();
+  const [student, setStudent] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchStudent = async () => {
+      if (!user) return;
+      // Get parent by Clerk ID
+      const { data: parent } = await supabase
+        .from('parents')
+        .select('id')
+        .eq('clerk_id', user.id)
+        .single();
+      if (!parent) return setLoading(false);
+      // Get student_id from parent_student
+      const { data: link } = await supabase
+        .from('parent_student')
+        .select('student_id')
+        .eq('parent_id', parent.id)
+        .single();
+      if (!link) return setLoading(false);
+      // Get student details
+      const { data: studentData } = await supabase
+        .from('students')
+        .select('*')
+        .eq('id', link.student_id)
+        .single();
+      setStudent(studentData || null);
+      setLoading(false);
+    };
+    fetchStudent();
+  }, [user]);
 
   if (!user) return null;
   if (user.unsafeMetadata.role !== "parent") return <Navigate to="/" />;
@@ -59,7 +92,7 @@ export default function ParentDashboard() {
           <p className="text-gray-600 mb-8">Hello, {user?.emailAddresses[0]?.emailAddress}! Here you can:</p>
           {/* Summary Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            {summary.map((item) => (
+            {summary.filter(item => item.label !== "Teachers").map((item) => (
               <Card key={item.label} className="flex flex-col items-center justify-center py-6">
                 <div className={`w-12 h-12 rounded-lg flex items-center justify-center mb-3 text-2xl ${item.color}`}>
                   <item.icon className="w-7 h-7" />
@@ -77,24 +110,21 @@ export default function ParentDashboard() {
                 <CardTitle>Your Child's Progress</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="flex items-center gap-3 mb-4">
-                  <Avatar>
-                    <AvatarFallback>A</AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <div className="font-semibold text-blue-900">Alex Johnson</div>
-                    <div className="text-xs text-blue-700">Grade 2</div>
-                  </div>
-                </div>
-                <div className="space-y-4">
-                  {childProgress.map((item) => (
-                    <div key={item.subject} className="flex items-center gap-4">
-                      <div className="w-32 font-medium text-gray-700">{item.subject}</div>
-                      <Progress value={item.percent} className="flex-1 h-3 bg-gray-200" />
-                      <div className="w-12 text-right font-semibold text-gray-900">{item.percent}%</div>
+                {loading ? (
+                  <div>Loading student...</div>
+                ) : student ? (
+                  <div className="flex items-center gap-3 mb-4">
+                    <Avatar>
+                      <AvatarFallback>{student.name ? student.name[0] : "A"}</AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <div className="font-semibold text-blue-900">{student.name}</div>
+                      <div className="text-xs text-blue-700">Class ID: {student.class_id}</div>
                     </div>
-                  ))}
-                </div>
+                  </div>
+                ) : (
+                  <div>No student found.</div>
+                )}
               </CardContent>
             </Card>
             {/* Recent Messages */}
@@ -152,12 +182,6 @@ export default function ParentDashboard() {
                 <div className="text-gray-100 text-sm mb-2" style={{color: 'white', opacity: 0.85}}>{feature.desc}</div>
               </Card>
             ))}
-          </div>
-          {/* Call to Action */}
-          <div className="rounded-3xl bg-gradient-to-r from-classdojo-green to-classdojo-blue p-12 text-white text-center mt-8">
-            <h2 className="text-2xl font-bold mb-4">Keeping teachers, families, and kids connected</h2>
-            <p className="text-lg opacity-90 mb-6">Building stronger classroom communities through meaningful connections and shared experiences.</p>
-            <Button className="bg-white text-classdojo-green font-bold px-8 py-3 text-lg rounded-full hover:bg-gray-100">Explore Features</Button>
           </div>
         </div>
       </SignedIn>

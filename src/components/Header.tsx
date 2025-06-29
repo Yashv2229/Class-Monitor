@@ -8,8 +8,35 @@ import {
   UserButton,
 } from "@clerk/clerk-react";
 import { Link } from "react-router-dom";
+import { useUser } from "@clerk/clerk-react";
+import { useEffect, useState } from "react";
+import { supabase } from "@/lib/supabaseClient";
 
 const Header = () => {
+  const { user } = useUser();
+  const role = user?.unsafeMetadata?.role;
+  const [teachers, setTeachers] = useState([]);
+  const [showTeachers, setShowTeachers] = useState(false);
+
+  useEffect(() => {
+    const fetchTeachers = async () => {
+      const { data } = await supabase.from('teachers').select('name');
+      setTeachers(data || []);
+    };
+    fetchTeachers();
+  }, []);
+
+  useEffect(() => {
+    // Inject Omni chat widget script if not already present
+    if (!document.getElementById("omnidimension-web-widget")) {
+      const script = document.createElement("script");
+      script.id = "omnidimension-web-widget";
+      script.async = true;
+      script.src = "https://backend.omnidim.io/web_widget.js?secret_key=d0bbff89726e59e9921f2fc3dc24d30c";
+      document.body.appendChild(script);
+    }
+  }, []);
+
   return (
     <header className="w-full bg-white border-b border-gray-100 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -24,9 +51,12 @@ const Header = () => {
 
           {/* Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
-            <a href="#" className="text-gray-700 hover:text-classdojo-green transition-colors font-medium">Teachers</a>
-            <a href="#" className="text-gray-700 hover:text-classdojo-green transition-colors font-medium">Our School</a>
-            <a href="#" className="text-gray-700 hover:text-classdojo-green transition-colors font-medium">Resources</a>
+            <Link to="/teachers" className="text-gray-700 hover:text-classdojo-green transition-colors font-medium">
+              Teachers
+            </Link>
+            <Link to="/school" className="text-gray-700 hover:text-classdojo-green transition-colors font-medium">
+              Our School
+            </Link>
             <SignedIn>
               <Link to="/dashboard" className="text-gray-700 hover:text-classdojo-green transition-colors font-medium">
                 Dashboard
