@@ -64,7 +64,14 @@ const HeroSection = () => {
         </div>
 
         <div className="flex justify-center">
-          <Button className="bg-classdojo-green hover:bg-classdojo-green/90 text-white px-8 py-4 text-lg rounded-full transform hover:scale-105 transition-all duration-300">
+          <Button 
+            className="bg-classdojo-green hover:bg-classdojo-green/90 text-white px-8 py-4 text-lg rounded-full transform hover:scale-105 transition-all duration-300"
+            onClick={() => {
+              if (role === "teacher") navigate("/dashboard/teacher");
+              else if (role === "parent") navigate("/dashboard/parent");
+              else navigate("/dashboard");
+            }}
+          >
             Get started
           </Button>
         </div>
