@@ -1,4 +1,3 @@
-
 import { Camera, MessageCircle, Award, Share2 } from "lucide-react";
 
 const FeaturesSection = () => {

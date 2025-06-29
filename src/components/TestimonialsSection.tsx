@@ -1,4 +1,3 @@
-
 import { Star } from "lucide-react";
 
 const TestimonialsSection = () => {
@@ -6,14 +5,7 @@ const TestimonialsSection = () => {
     <div className="py-20 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <div className="flex justify-center items-center space-x-2 mb-4">
-            {[...Array(5)].map((_, i) => (
-              <Star key={i} className="w-8 h-8 fill-yellow-400 text-yellow-400" />
-            ))}
-          </div>
-          <p className="text-xl text-gray-600">
-            <span className="font-bold text-2xl text-gray-900">2 million+</span> reviews
-          </p>
+          {/* Removed stars and reviews */}
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -24,7 +16,7 @@ const TestimonialsSection = () => {
                 <div className="w-16 h-16 bg-classdojo-blue rounded-full mx-auto mb-4 flex items-center justify-center">
                   <span className="text-white font-bold text-xl">👨‍🏫</span>
                 </div>
-                <p className="text-sm text-gray-600 italic">"ClassDojo has transformed how I connect with my students and their families."</p>
+                <p className="text-sm text-gray-600 italic">"Class Monitor has transformed how I connect with my students and their families."</p>
               </div>
             </div>
             
@@ -66,20 +58,7 @@ const TestimonialsSection = () => {
               <p className="text-xl opacity-90 mb-8">
                 Building stronger classroom communities through meaningful connections and shared experiences.
               </p>
-              <div className="flex justify-center space-x-8">
-                <div className="text-center">
-                  <div className="text-3xl font-bold">45M+</div>
-                  <div className="text-sm opacity-75">Students & Parents</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-3xl font-bold">180+</div>
-                  <div className="text-sm opacity-75">Countries</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-3xl font-bold">95%</div>
-                  <div className="text-sm opacity-75">Teacher Satisfaction</div>
-                </div>
-              </div>
+              {/* Removed numbers (students & parents, countries, teacher satisfaction) */}
             </div>
           </div>
         </div>
