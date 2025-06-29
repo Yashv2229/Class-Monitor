@@ -27,12 +27,12 @@ const Header = () => {
   }, []);
 
   useEffect(() => {
-    // Inject Omni chat widget script if not already present
+    // Inject OmniDimension widget globally if not already present
     if (!document.getElementById("omnidimension-web-widget")) {
       const script = document.createElement("script");
       script.id = "omnidimension-web-widget";
       script.async = true;
-      script.src = "https://backend.omnidim.io/web_widget.js?secret_key=d0bbff89726e59e9921f2fc3dc24d30c";
+      script.src = "https://backend.omnidim.io/web_widget.js?secret_key=c4cce19c53576e26ee91d76d192e521a";
       document.body.appendChild(script);
     }
   }, []);

@@ -7,11 +7,10 @@ const Chatbot = () => {
       const script = document.createElement("script");
       script.id = "omnidimension-web-widget";
       script.async = true;
-      script.src = "https://backend.omnidim.io/web_widget.js?secret_key=d0bbff89726e59e9921f2fc3dc24d30c";
+      script.src = "https://backend.omnidim.io/web_widget.js?secret_key=c4cce19c53576e26ee91d76d192e521a";
       document.body.appendChild(script);
     }
   }, []);
-
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50">
       <h1 className="text-3xl font-bold mb-6">Chatbot and Call</h1>
