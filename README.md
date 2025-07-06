@@ -162,16 +162,3 @@ Pull requests are welcome! For major changes, please open an issue first to disc
 
 [MIT](LICENSE)
 
----
-
-## Contact
-
-For questions or support, please open an issue or contact the maintainer.
-
----
-
-**Enjoy using Class Monitor!**
-
----
-
-Let me know if you want to add more details or further customize the README!
